@@ -1,0 +1,11 @@
+secret.json
+oauth_token.json
+get_token.py
+
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+*.log
+.DS_Store

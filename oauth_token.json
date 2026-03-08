@@ -1,0 +1,10 @@
+{
+  "token": "ya29.a0ATkoCc5gna0alWBQZqYyf-7h7M2MLyHvLUSLPu2wZD6KuFp05z0UPNCE064cGjkC0Utb1yXOvRIftWbPcXrzoOGyYTU7_7VmPMu0G8FC1HCVaTA5Bxm-nLvocqjv0sKGxfhIUjt9J5o_5Iky16_DqhoyOC3RFHaIAoxe0lDSaZch69dVV3JSU93CblC-VbhBJCqkuh0aCgYKAdcSARMSFQHGX2MitYjYUDsqDufxnP2qlTCdNQ0206",
+  "refresh_token": "1//0g8DRfpSoj9fwCgYIARAAGBASNwF-L9IrN-emeX_4Bo8yjE-CyOavLlw68CM5nCvhN_0piv6qNAmG51SASkWpHOAf5MIB897wljs",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "client_id": "672974078145-gdb9a3s4ajrbne4juj8ro2uc3oc5gqhl.apps.googleusercontent.com",
+  "client_secret": "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",
+  "scopes": [
+    "https://www.googleapis.com/auth/business.manage"
+  ]
+}
