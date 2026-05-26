@@ -14,8 +14,8 @@ configure_logging()
 logger = logging.getLogger("google-business-mcp-server")
 
 backend = HeaderCredentialBackend()
-mcp = FastMCP("MewCP Google Business MCP Server",
-    # stateless_http=True,
+mcp = FastMCP(
+    "MewCP Google Business MCP Server",
     middleware=[CredentialMiddleware(backend, "oauth")],
 )
 register_tools(mcp)
