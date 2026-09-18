@@ -1,5 +1,5 @@
-fastmcp>=2.14.2
-fastmcp-credentials>=0.1.1
+fastmcp
+fastmcp-credentials>=0.2.0,<0.3.0
 google-api-python-client>=2.110.0
 google-auth>=2.25.0
 google-auth-httplib2>=0.2.0
