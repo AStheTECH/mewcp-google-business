@@ -23,15 +23,17 @@ def _handle_request_exc(result_class, tlog, exc):
     if isinstance(exc, HttpError):
         status = exc.resp.status if exc.resp is not None else 500
         message = exc.reason or f"HTTP {status}"
+        details = None
         try:
             content = json.loads(exc.content)
             message = content.get("error", {}).get("message", message)
+            details = content.get("error", {}).get("details") or None
         except Exception:
             pass
         retriable = status in (429, 500, 502, 503)
         tlog.failure("UPSTREAM_ERROR", f"HTTP {status}")
         return result_class(success=False, statusCode=status, retriable=retriable,
-            error=ToolError(code="UPSTREAM_ERROR", message=str(message)))
+            error=ToolError(code="UPSTREAM_ERROR", message=str(message), details=details))
     # Must precede ValueError — ValidationError subclasses it.
     if isinstance(exc, pydantic.ValidationError):
         tlog.failure("UPSTREAM_ERROR", str(exc))  # detail stays in the log
