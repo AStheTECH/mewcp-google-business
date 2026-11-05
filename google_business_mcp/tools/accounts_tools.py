@@ -224,8 +224,9 @@ def register_accounts_tools(mcp: FastMCP) -> None:
         filter_: str | None = Field(
             default=None,
             description="Filter on the invitation's target type (Invitation.target_type); "
-            "filterable values are ACCOUNTS_ONLY and LOCATIONS_ONLY. Google's docs do not "
-            "specify the filter expression syntax. Omit to return all pending invitations.",
+            "filterable values are ACCOUNTS_ONLY and LOCATIONS_ONLY, e.g. "
+            "target_type=ACCOUNTS_ONLY (snake_case field name; targetType is rejected). "
+            "Omit to return all pending invitations.",
         ),
     ) -> InvitationListResult:
         tlog = ToolLogger(logger, "list_invitations")
