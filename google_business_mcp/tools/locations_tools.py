@@ -50,7 +50,8 @@ def register_locations_tools(mcp: FastMCP) -> None:
     def list_locations(
         parent: str = Field(
             description="The name of the account to fetch locations from, in the form "
-            "accounts/{accountId}. If the parent Account is of type PERSONAL, only "
+            "accounts/{accountId}. Get valid account names from list_accounts. "
+            "If the parent Account is of type PERSONAL, only "
             "directly-owned Locations are returned; "
             "otherwise all accessible locations (direct or indirect) are returned."
         ),
@@ -107,7 +108,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
     def create_location(
         parent: str = Field(
             description="The name of the account in which to create this location, in the "
-            "form accounts/{accountId}."
+            "form accounts/{accountId}. Get valid account names from list_accounts."
         ),
         location: dict = Field(
             description="Location object to create. Required sub-fields: title (and "
