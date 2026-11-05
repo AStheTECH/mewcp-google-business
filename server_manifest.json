@@ -4,7 +4,7 @@
     "name": "mewcp-google-business",
     "package": "google_business_mcp",
     "auth": "oauth",
-    "version": "v1.1.0",
+    "version": "v1.2.0",
     "api_base": null
   },
   "tools": {
@@ -19,7 +19,7 @@
             "description": "Lists the locations for the specified account, optionally filtered and sorted, and returns the matching Location objects with pagination info.",
             "tier": "GET",
             "params": [
-              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from, in the form accounts/{accountId}. If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from, in the form accounts/{accountId}. Get valid account names from list_accounts. If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
               { "name": "readMask", "type": "string", "required": true, "description": "Comma-separated list of fully qualified field names to return. Example: \"user.displayName,photo\"." },
               { "name": "pageSize", "type": "integer", "required": false, "description": "How many locations to fetch per page. Default 10, minimum 1, maximum 100." },
               { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page; returned by a previous call when more locations exist than fit the page size." },
@@ -38,7 +38,7 @@
             "description": "Creates a new Location that will be owned by the logged-in user, and returns the newly created Location.",
             "tier": "CREATE",
             "params": [
-              { "name": "parent", "type": "string", "required": true, "description": "The name of the account in which to create this location, in the form accounts/{accountId}." },
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account in which to create this location, in the form accounts/{accountId}. Get valid account names from list_accounts." },
               { "name": "location", "type": "object", "required": true, "description": "Location object to create. Full schema: see get_location. Required sub-fields per the Location schema: title (and primaryCategory within categories if categories are set)." },
               { "name": "validateOnly", "type": "boolean", "required": false, "description": "If true, validates the request without actually creating the location." },
               { "name": "requestId", "type": "string", "required": false, "description": "A unique request ID for the server to detect duplicate requests. UUIDs recommended. Max 50 characters." }
@@ -405,6 +405,141 @@
               { "name": "nextPageToken", "type": "string" }
             ],
             "schema": { "data": "SearchKeywordImpressionsMonthlyData", "result": "SearchKeywordImpressionsMonthlyResult" }
+          }
+        }
+      },
+      "accounts": {
+        "file": "accounts_tools.py",
+        "doc_source": ["list_accounts.md", "get_account.md", "create_account.md", "update_account.md", "list_account_admins.md", "list_invitations.md", "list_location_admins.md"],
+        "register_fn": "register_accounts_tools",
+        "tools": {
+          "list_accounts": {
+            "endpoint": "GET https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+            "description": "Lists all of the accounts for the authenticated user, including accounts the user owns and accounts the user has management rights to.",
+            "tier": "GET",
+            "params": [
+              { "name": "filter", "type": "string", "required": false, "description": "A filter constraining the accounts to return. The response includes only entries that match the filter. If `filter` is empty, then no constraints are applied and all accounts (paginated) are retrieved for the requested account. For example, a request with the filter `type=USER_GROUP` will only return user groups. The `type` field is the only supported filter." },
+              { "name": "pageSize", "type": "integer", "required": false, "description": "How many accounts to fetch per page. The default and maximum is 20." },
+              { "name": "pageToken", "type": "string", "required": false, "description": "If specified, the next page of accounts is retrieved. The `pageToken` is returned when a call to `accounts.list` returns more results than can fit into the requested page size." },
+              { "name": "parentAccount", "type": "string", "required": false, "description": "The resource name of the account for which the list of directly accessible accounts is to be retrieved. This only makes sense for Organizations and User Groups. If empty, will return `ListAccounts` for the authenticated user. `accounts/{account_id}`." }
+            ],
+            "response_fields": [
+              { "name": "accounts[]", "type": "array (Account)" },
+              { "name": "nextPageToken", "type": "string" }
+            ],
+            "schema": { "data": "AccountListData", "result": "AccountListResult" },
+            "doc_file": "accounts/list_accounts.md"
+          },
+          "get_account": {
+            "endpoint": "GET https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{accountsId}",
+            "description": "Gets the specified account. Returns NOT_FOUND if the account does not exist or if the caller does not have access rights to it.",
+            "tier": "GET",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The name of the account to fetch. Must match `^accounts/[^/]+$`." }
+            ],
+            "response_fields": [
+              { "name": "accountName", "type": "string" },
+              { "name": "accountNumber", "type": "string" },
+              { "name": "name", "type": "string" },
+              { "name": "organizationInfo", "type": "object (OrganizationInfo)" },
+              { "name": "permissionLevel", "type": "string" },
+              { "name": "primaryOwner", "type": "string" },
+              { "name": "role", "type": "string" },
+              { "name": "type", "type": "string" },
+              { "name": "verificationState", "type": "string" },
+              { "name": "vettedState", "type": "string" }
+            ],
+            "schema": { "data": "AccountGetData", "result": "AccountGetResult" },
+            "doc_file": "accounts/get_account.md"
+          },
+          "create_account": {
+            "endpoint": "POST https://mybusinessaccountmanagement.googleapis.com/v1/accounts",
+            "description": "Creates an account with the specified name and type under the given parent.",
+            "tier": "CREATE",
+            "params": [
+              { "name": "accountName", "type": "string", "required": true, "description": "The name of the account. For an account of type `PERSONAL`, this is the first and last name of the user account." },
+              { "name": "primaryOwner", "type": "string", "required": true, "description": "Input only. The resource name of the account which will be the primary owner of the account being created. It should be of the form `accounts/{account_id}`." },
+              { "name": "type", "type": "string", "required": true, "description": "Contains the type of account. Accounts of type PERSONAL and ORGANIZATION cannot be created using this API. Values: `ACCOUNT_TYPE_UNSPECIFIED` — Not specified.; `PERSONAL` — An end-user account.; `LOCATION_GROUP` — A group of Locations.; `USER_GROUP` — A User Group for segregating organization staff in groups.; `ORGANIZATION` — An organization representing a company." }
+            ],
+            "response_fields": [
+              { "name": "accountName", "type": "string" },
+              { "name": "accountNumber", "type": "string" },
+              { "name": "name", "type": "string" },
+              { "name": "organizationInfo", "type": "object (OrganizationInfo)" },
+              { "name": "permissionLevel", "type": "string" },
+              { "name": "primaryOwner", "type": "string" },
+              { "name": "role", "type": "string" },
+              { "name": "type", "type": "string" },
+              { "name": "verificationState", "type": "string" },
+              { "name": "vettedState", "type": "string" }
+            ],
+            "schema": { "data": "AccountCreateData", "result": "AccountCreateResult" },
+            "doc_file": "accounts/create_account.md"
+          },
+          "update_account": {
+            "endpoint": "PATCH https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{accountsId}",
+            "description": "Updates the specified business account. Personal accounts cannot be updated using this method.",
+            "tier": "UPDATE",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "Immutable. The resource name, in the format `accounts/{account_id}`. Must match `^accounts/[^/]+$`." },
+              { "name": "updateMask", "type": "string", "required": true, "description": "The specific fields that should be updated. The only editable field is `accountName`." },
+              { "name": "validateOnly", "type": "boolean", "required": false, "description": "If true, the request is validated without actually updating the account." },
+              { "name": "accountName", "type": "string", "required": true, "description": "The name of the account. For an account of type `PERSONAL`, this is the first and last name of the user account." }
+            ],
+            "response_fields": [
+              { "name": "accountName", "type": "string" },
+              { "name": "accountNumber", "type": "string" },
+              { "name": "name", "type": "string" },
+              { "name": "organizationInfo", "type": "object (OrganizationInfo)" },
+              { "name": "permissionLevel", "type": "string" },
+              { "name": "primaryOwner", "type": "string" },
+              { "name": "role", "type": "string" },
+              { "name": "type", "type": "string" },
+              { "name": "verificationState", "type": "string" },
+              { "name": "vettedState", "type": "string" }
+            ],
+            "schema": { "data": "AccountUpdateData", "result": "AccountUpdateResult", "note": "AccountUpdateData holds before: AccountData and after: AccountData (UPDATE-tier pattern)." },
+            "doc_file": "accounts/update_account.md"
+          },
+          "list_account_admins": {
+            "endpoint": "GET https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{accountsId}/admins",
+            "description": "Lists the admins for the specified account.",
+            "tier": "GET",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account from which to retrieve a list of admins. Must match `^accounts/[^/]+$`. Note: pass `accounts/{account_id}` only; the `/admins` segment is added by the path." }
+            ],
+            "response_fields": [
+              { "name": "accountAdmins[]", "type": "array (Admin)" }
+            ],
+            "schema": { "data": "AccountAdminListData", "result": "AccountAdminListResult" },
+            "doc_file": "accounts/list_account_admins.md"
+          },
+          "list_invitations": {
+            "endpoint": "GET https://mybusinessaccountmanagement.googleapis.com/v1/accounts/{accountsId}/invitations",
+            "description": "Lists pending invitations for the specified account.",
+            "tier": "GET",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account from which the list of invitations is being retrieved. Must match `^accounts/[^/]+$`. Note: pass `accounts/{account_id}` only; the `/invitations` segment is added by the path." },
+              { "name": "filter", "type": "string", "required": false, "description": "Filtering the response is supported via the Invitation.target_type field. Filterable values for `targetType`: `ACCOUNTS_ONLY`, `LOCATIONS_ONLY`." }
+            ],
+            "response_fields": [
+              { "name": "invitations[]", "type": "array (Invitation)" }
+            ],
+            "schema": { "data": "InvitationListData", "result": "InvitationListResult" },
+            "doc_file": "accounts/list_invitations.md"
+          },
+          "list_location_admins": {
+            "endpoint": "GET https://mybusinessaccountmanagement.googleapis.com/v1/locations/{locationsId}/admins",
+            "description": "Lists all of the admins for the specified location.",
+            "tier": "GET",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the location to list admins of. Must match `^locations/[^/]+$`. Note: pass `locations/{location_id}` only; the `/admins` segment is added by the path." }
+            ],
+            "response_fields": [
+              { "name": "admins[]", "type": "array (Admin)" }
+            ],
+            "schema": { "data": "LocationAdminListData", "result": "LocationAdminListResult" },
+            "doc_file": "accounts/list_location_admins.md"
           }
         }
       }
