@@ -49,8 +49,9 @@ def register_locations_tools(mcp: FastMCP) -> None:
     )
     def list_locations(
         parent: str = Field(
-            description="The name of the account to fetch locations from. If the parent "
-            "Account is of type PERSONAL, only directly-owned Locations are returned; "
+            description="The name of the account to fetch locations from, in the form "
+            "accounts/{accountId}. If the parent Account is of type PERSONAL, only "
+            "directly-owned Locations are returned; "
             "otherwise all accessible locations (direct or indirect) are returned."
         ),
         read_mask: str = Field(
@@ -104,7 +105,10 @@ def register_locations_tools(mcp: FastMCP) -> None:
         annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=True),
     )
     def create_location(
-        parent: str = Field(description="The name of the account in which to create this location."),
+        parent: str = Field(
+            description="The name of the account in which to create this location, in the "
+            "form accounts/{accountId}."
+        ),
         location: dict = Field(
             description="Location object to create. Required sub-fields: title (and "
             "primaryCategory within categories if categories are set)."
@@ -144,7 +148,9 @@ def register_locations_tools(mcp: FastMCP) -> None:
         annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
     )
     def get_location(
-        name: str = Field(description="The name of the location to fetch."),
+        name: str = Field(
+            description="The name of the location to fetch, in the form locations/{locationId}."
+        ),
         read_mask: str = Field(
             description="Read mask specifying which fields to return in the response. "
             'Comma-separated list of fully qualified field names. Example: "title,websiteUri".'
@@ -214,7 +220,9 @@ def register_locations_tools(mcp: FastMCP) -> None:
         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True, openWorldHint=True),
     )
     def delete_location(
-        name: str = Field(description="The name of the location to delete."),
+        name: str = Field(
+            description="The name of the location to delete, in the form locations/{locationId}."
+        ),
     ) -> LocationDeleteResult:
         tlog = ToolLogger(logger, "delete_location")
         try:
@@ -235,7 +243,9 @@ def register_locations_tools(mcp: FastMCP) -> None:
         annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
     )
     def get_google_updated_location(
-        name: str = Field(description="The name of the location to fetch."),
+        name: str = Field(
+            description="The name of the location to fetch, in the form locations/{locationId}."
+        ),
         read_mask: str = Field(
             description="Comma-separated list of fully qualified field names to return."
         ),
