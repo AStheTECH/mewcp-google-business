@@ -27,3 +27,13 @@ def get_performance_service():
 
     creds = Credentials(token=cred.access_token, scopes=cred.scopes)
     return build("businessprofileperformance", "v1", credentials=creds)
+
+
+def get_account_management_service():
+    """Build and return an authenticated My Business Account Management v1 client."""
+    cred = get_credentials()
+    if not cred.access_token:
+        raise ValueError("No OAuth access token available in credentials")
+
+    creds = Credentials(token=cred.access_token, scopes=cred.scopes)
+    return build("mybusinessaccountmanagement", "v1", credentials=creds)
