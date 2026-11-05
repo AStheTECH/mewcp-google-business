@@ -102,7 +102,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
             "Creates a new Location that will be owned by the logged-in user, and returns "
             "the newly created Location."
         ),
-        annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=True),
+        annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
     def create_location(
         parent: str = Field(
@@ -174,7 +174,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
             "original state is not stored after the call. The response includes both the "
             "before and after state so you have a full record of what changed."
         ),
-        annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=True),
+        annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
     def update_location(
         location_name: str = Field(
@@ -290,7 +290,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
             "values — the original state is not stored after the call. The response "
             "includes both the before and after state so you have a full record of what changed."
         ),
-        annotations=ToolAnnotations(readOnlyHint=False, openWorldHint=True),
+        annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
     def update_location_attributes(
         attributes_name: str = Field(
