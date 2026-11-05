@@ -8,6 +8,7 @@ from .categories_tools import register_categories_tools
 from .attributes_tools import register_attributes_tools
 from .google_locations_tools import register_google_locations_tools
 from .performance_tools import register_performance_tools
+from .accounts_tools import register_accounts_tools
 
 
 def register_tools(mcp: FastMCP) -> None:
@@ -17,3 +18,4 @@ def register_tools(mcp: FastMCP) -> None:
     register_attributes_tools(mcp)
     register_google_locations_tools(mcp)
     register_performance_tools(mcp)
+    register_accounts_tools(mcp)
