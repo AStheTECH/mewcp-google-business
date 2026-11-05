@@ -10,7 +10,7 @@ from ._base import ToolResult
 class LocationData(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    name: str
+    name: str | None = None
     languageCode: str | None = None
     storeCode: str | None = None
     title: str | None = None
