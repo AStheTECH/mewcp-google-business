@@ -4,7 +4,7 @@
     "name": "mewcp-google-business",
     "package": "google_business_mcp",
     "auth": "oauth",
-    "version": "v1.0.0",
+    "version": "v1.1.0",
     "api_base": null
   },
   "tools": {
@@ -19,7 +19,7 @@
             "description": "Lists the locations for the specified account, optionally filtered and sorted, and returns the matching Location objects with pagination info.",
             "tier": "GET",
             "params": [
-              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from. If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from, in the form accounts/{accountId}. If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
               { "name": "readMask", "type": "string", "required": true, "description": "Comma-separated list of fully qualified field names to return. Example: \"user.displayName,photo\"." },
               { "name": "pageSize", "type": "integer", "required": false, "description": "How many locations to fetch per page. Default 10, minimum 1, maximum 100." },
               { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page; returned by a previous call when more locations exist than fit the page size." },
@@ -38,7 +38,7 @@
             "description": "Creates a new Location that will be owned by the logged-in user, and returns the newly created Location.",
             "tier": "CREATE",
             "params": [
-              { "name": "parent", "type": "string", "required": true, "description": "The name of the account in which to create this location." },
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account in which to create this location, in the form accounts/{accountId}." },
               { "name": "location", "type": "object", "required": true, "description": "Location object to create. Full schema: see get_location. Required sub-fields per the Location schema: title (and primaryCategory within categories if categories are set)." },
               { "name": "validateOnly", "type": "boolean", "required": false, "description": "If true, validates the request without actually creating the location." },
               { "name": "requestId", "type": "string", "required": false, "description": "A unique request ID for the server to detect duplicate requests. UUIDs recommended. Max 50 characters." }
@@ -72,7 +72,7 @@
             "description": "Returns the specified location as last set by the merchant; may not reflect updates from Google or user-generated content live on Google Maps.",
             "tier": "GET",
             "params": [
-              { "name": "name", "type": "string", "required": true, "description": "The name of the location to fetch." },
+              { "name": "name", "type": "string", "required": true, "description": "The name of the location to fetch, in the form locations/{locationId}." },
               { "name": "readMask", "type": "string", "required": true, "description": "Read mask specifying which fields to return in the response. Comma-separated list of fully qualified field names. Example: \"title,websiteUri\"." }
             ],
             "response_fields": [
@@ -138,7 +138,7 @@
             "description": "Deletes a location; if it can't be deleted via the API, the Google Business Profile website must be used instead.",
             "tier": "DELETE",
             "params": [
-              { "name": "name", "type": "string", "required": true, "description": "The name of the location to delete." }
+              { "name": "name", "type": "string", "required": true, "description": "The name of the location to delete, in the form locations/{locationId}." }
             ],
             "response_fields": [],
             "schema": { "data": "LocationDeleteData", "result": "LocationDeleteResult" }
@@ -148,7 +148,7 @@
             "description": "Returns the specified location as it appears live on Google Maps and Search, which may differ from the merchant's version, along with masks of what Google changed and what's still pending.",
             "tier": "GET",
             "params": [
-              { "name": "name", "type": "string", "required": true, "description": "The name of the location to fetch." },
+              { "name": "name", "type": "string", "required": true, "description": "The name of the location to fetch, in the form locations/{locationId}." },
               { "name": "readMask", "type": "string", "required": true, "description": "Comma-separated list of fully qualified field names to return. Example: \"user.displayName,photo\"." }
             ],
             "response_fields": [
