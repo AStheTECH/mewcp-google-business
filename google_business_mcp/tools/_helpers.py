@@ -38,6 +38,11 @@ def _handle_request_exc(result_class, tlog, exc):
         return result_class(success=False, statusCode=502, retriable=False,
             error=ToolError(code="UPSTREAM_ERROR",
                             message="Upstream response did not match the expected schema"))
+    # googleapiclient raises TypeError for bad params (resource-name pattern, unknown kwarg).
+    if isinstance(exc, TypeError):
+        tlog.failure("VALIDATION_ERROR", str(exc))
+        return result_class(success=False, statusCode=400, retriable=False,
+            error=ToolError(code="VALIDATION_ERROR", message=str(exc)))
     # CredentialError subclasses Exception, not ValueError.
     if isinstance(exc, (CredentialError, ValueError)):
         tlog.failure("AUTH_ERROR", str(exc))

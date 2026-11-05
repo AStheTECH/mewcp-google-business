@@ -23,26 +23,26 @@ logger = logging.getLogger("google-business-mcp.tools.performance")
 
 
 def _flatten_date(prefix: str, date: dict) -> dict:
-    """Flatten a {year, month, day} dict into dotted query kwargs, skipping absent keys."""
+    """Flatten a {year, month, day} dict into googleapiclient query kwargs, skipping absent keys."""
     kwargs = {}
     for key in ("year", "month", "day"):
         value = date.get(key)
         if value is not None:
-            kwargs[f"{prefix}.{key}"] = value
+            kwargs[f"{prefix}_{key}"] = value
     return kwargs
 
 
 def _flatten_daily_range(daily_range: dict) -> dict:
     kwargs = {}
-    kwargs.update(_flatten_date("dailyRange.startDate", daily_range["startDate"]))
-    kwargs.update(_flatten_date("dailyRange.endDate", daily_range["endDate"]))
+    kwargs.update(_flatten_date("dailyRange_startDate", daily_range["startDate"]))
+    kwargs.update(_flatten_date("dailyRange_endDate", daily_range["endDate"]))
     return kwargs
 
 
 def _flatten_monthly_range(monthly_range: dict) -> dict:
     kwargs = {}
-    kwargs.update(_flatten_date("monthlyRange.startMonth", monthly_range["startMonth"]))
-    kwargs.update(_flatten_date("monthlyRange.endMonth", monthly_range["endMonth"]))
+    kwargs.update(_flatten_date("monthlyRange_startMonth", monthly_range["startMonth"]))
+    kwargs.update(_flatten_date("monthlyRange_endMonth", monthly_range["endMonth"]))
     return kwargs
 
 
@@ -50,13 +50,13 @@ def _flatten_daily_sub_entity_type(daily_sub_entity_type: dict) -> dict:
     kwargs = {}
     day_of_week = daily_sub_entity_type.get("dayOfWeek")
     if day_of_week is not None:
-        kwargs["dailySubEntityType.dayOfWeek"] = day_of_week
+        kwargs["dailySubEntityType_dayOfWeek"] = day_of_week
     time_of_day = daily_sub_entity_type.get("timeOfDay")
     if time_of_day is not None:
         for key in ("hours", "minutes", "seconds", "nanos"):
             value = time_of_day.get(key)
             if value is not None:
-                kwargs[f"dailySubEntityType.timeOfDay.{key}"] = value
+                kwargs[f"dailySubEntityType_timeOfDay_{key}"] = value
     return kwargs
 
 
