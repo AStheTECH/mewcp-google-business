@@ -88,7 +88,8 @@ def register_accounts_tools(mcp: FastMCP) -> None:
         description=(
             "Returns the specified account, including its name, type, role, permission level, "
             "verification and vetted state, and organization info for organization accounts. "
-            "Returns NOT_FOUND if the account does not exist or the caller has no access rights to it."
+            "If the account does not exist or the caller has no access rights to it, the call "
+            "fails with statusCode 404 and error code UPSTREAM_ERROR."
         ),
         annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
     )
