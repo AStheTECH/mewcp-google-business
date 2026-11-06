@@ -135,7 +135,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
             default=None,
             description="If true, validates the request without actually creating the location. "
             "Google recommends calling with validate_only=true first to confirm required fields "
-            "are present and the address is properly formatted.",
+            "are present and the address is properly formatted. Omit to create the location.",
         ),
         request_id: str | None = Field(
             default=None,
@@ -207,14 +207,15 @@ def register_locations_tools(mcp: FastMCP) -> None:
         location: dict = Field(description="Location object carrying the updated field values."),
         validate_only: bool | None = Field(
             default=None,
-            description="If true, validates the request without actually updating anything; "
-            "the returned after is then empty rather than the updated location.",
+            description="If true, validates the request without saving anything; the returned "
+            "after is then a preview of the location as it would look, not a saved change. "
+            "Omit to apply the update.",
         ),
     ) -> LocationUpdateResult:
         tlog = ToolLogger(logger, "update_location")
         try:
             svc = service.get_business_information_service()
-            before = svc.locations().get(name=location_name, readMask=update_mask).execute()
+            before = svc.locations().get(name=location_name, readMask=f"name,{update_mask}").execute()
             after = svc.locations().patch(
                 name=location_name, updateMask=update_mask, validateOnly=validate_only, body=location,
             ).execute()
