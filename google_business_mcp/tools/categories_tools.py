@@ -45,7 +45,7 @@ def register_categories_tools(mcp: FastMCP) -> None:
                 "Filter string from the user; the only supported field is `displayName`, "
                 "e.g. `filter=displayName=foo`. Quote values that contain spaces: "
                 "`displayName=\"software company\"` (an unquoted multi-word value is rejected "
-                "with 400)."
+                "with 400). Omit to return all categories."
             ),
         ),
         page_size: int | None = Field(
@@ -104,7 +104,8 @@ def register_categories_tools(mcp: FastMCP) -> None:
         ),
         region_code: str | None = Field(
             default=None,
-            description="The ISO 3166-1 alpha-2 country code used to infer non-standard language.",
+            description="The ISO 3166-1 alpha-2 country code used to infer non-standard language. "
+            "Omit if not needed.",
         ),
     ) -> CategoryListResult:
         tlog = ToolLogger(logger, "batch_get_categories")

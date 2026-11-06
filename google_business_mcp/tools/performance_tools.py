@@ -101,7 +101,8 @@ def register_performance_tools(mcp: FastMCP) -> None:
             description=(
                 "The sub-entity type/id the time series relates to. Currently no `DailyMetric` supports this "
                 "(breakdown not available). Union of `dayOfWeek` (enum) or `timeOfDay` "
-                '(`{"hours", "minutes", "seconds", "nanos"}`).'
+                '(`{"hours", "minutes", "seconds", "nanos"}`). Omit it; no metric currently '
+                "supports a breakdown."
             ),
         ),
     ) -> DailyMetricsTimeSeriesResult:
@@ -210,7 +211,8 @@ def register_performance_tools(mcp: FastMCP) -> None:
         ),
         page_token: str | None = Field(
             default=None,
-            description="Base64-encoded token indicating the next paginated result to return.",
+            description="Base64-encoded token indicating the next paginated result to return. "
+            "Omit for the first page.",
         ),
     ) -> SearchKeywordImpressionsMonthlyResult:
         tlog = ToolLogger(logger, "list_search_keyword_impressions_monthly")

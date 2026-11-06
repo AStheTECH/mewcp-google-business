@@ -68,7 +68,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
         page_token: str | None = Field(
             default=None,
             description="Fetches the next page; returned by a previous call when more "
-            "locations exist than fit the page size.",
+            "locations exist than fit the page size. Omit for the first page.",
         ),
         filter_: str | None = Field(
             default=None,
@@ -86,7 +86,8 @@ def register_locations_tools(mcp: FastMCP) -> None:
         order_by: str | None = Field(
             default=None,
             description="Comma-separated sort fields (SQL syntax). Default ascending; append "
-            '" desc" for descending. Valid fields: title, storeCode. E.g. "title, storeCode desc".',
+            '" desc" for descending. Valid fields: title, storeCode. E.g. "title, storeCode desc". '
+            "Omit to use Google's default order.",
         ),
     ) -> LocationListResult:
         tlog = ToolLogger(logger, "list_locations")
@@ -139,7 +140,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
         request_id: str | None = Field(
             default=None,
             description="A unique request ID for the server to detect duplicate requests. "
-            "UUIDs recommended. Max 50 characters.",
+            "UUIDs recommended. Max 50 characters. Omit to skip duplicate detection.",
         ),
     ) -> LocationCreateResult:
         tlog = ToolLogger(logger, "create_location")

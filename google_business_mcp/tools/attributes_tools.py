@@ -41,18 +41,19 @@ def register_attributes_tools(mcp: FastMCP) -> None:
             default=None,
             description=(
                 "The primary category stable ID to find available attributes. Must be of the "
-                "format categories/{category_id}."
+                "format categories/{category_id}. Omit when parent is set."
             ),
         ),
         region_code: str | None = Field(
             default=None,
-            description="The ISO 3166-1 alpha-2 country code to find available attributes.",
+            description="The ISO 3166-1 alpha-2 country code to find available attributes. "
+            "Omit when parent is set.",
         ),
         language_code: str | None = Field(
             default=None,
             description=(
                 "The BCP 47 code of language to get attribute display names in. Falls back to "
-                "English if unavailable."
+                "English if unavailable. Omit when parent is set."
             ),
         ),
         show_all: bool | None = Field(
