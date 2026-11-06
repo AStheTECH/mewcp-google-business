@@ -79,11 +79,14 @@ def register_performance_tools(mcp: FastMCP) -> None:
         ),
         daily_metric: str = Field(
             description=(
-                "The metric to retrieve time series for. One of: `DAILY_METRIC_UNKNOWN`, "
+                "The metric to retrieve time series for. One of: "
                 "`BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, `BUSINESS_IMPRESSIONS_DESKTOP_SEARCH`, "
                 "`BUSINESS_IMPRESSIONS_MOBILE_MAPS`, `BUSINESS_IMPRESSIONS_MOBILE_SEARCH`, "
-                "`BUSINESS_CONVERSATIONS`, `BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, "
-                "`BUSINESS_BOOKINGS`, `BUSINESS_FOOD_ORDERS`, `BUSINESS_FOOD_MENU_CLICKS`."
+                "`BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, "
+                "`MESSAGING_CLICKS` (clicks on the messaging button, e.g. WhatsApp), "
+                "`BUSINESS_BOOKINGS`, `BUSINESS_FOOD_MENU_CLICKS`. "
+                "Deprecated upstream: `BUSINESS_CONVERSATIONS`, `BUSINESS_FOOD_ORDERS`. "
+                "`DAILY_METRIC_UNKNOWN` is the default unknown value."
             )
         ),
         daily_range: dict = Field(
@@ -140,8 +143,14 @@ def register_performance_tools(mcp: FastMCP) -> None:
         ),
         daily_metrics: list[str] = Field(
             description=(
-                "The metrics to retrieve time series for. Same enum values as `get_daily_metrics_time_series`. "
-                "Repeat this parameter for multiple metrics."
+                "The metrics to retrieve time series for. Each one of: "
+                "`BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, `BUSINESS_IMPRESSIONS_DESKTOP_SEARCH`, "
+                "`BUSINESS_IMPRESSIONS_MOBILE_MAPS`, `BUSINESS_IMPRESSIONS_MOBILE_SEARCH`, "
+                "`BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, "
+                "`MESSAGING_CLICKS` (clicks on the messaging button, e.g. WhatsApp), "
+                "`BUSINESS_BOOKINGS`, `BUSINESS_FOOD_MENU_CLICKS`. "
+                "Deprecated upstream: `BUSINESS_CONVERSATIONS`, `BUSINESS_FOOD_ORDERS`. "
+                "`DAILY_METRIC_UNKNOWN` is the default unknown value."
             )
         ),
         daily_range: dict = Field(
