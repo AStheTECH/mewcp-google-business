@@ -4,7 +4,7 @@
     "name": "mewcp-google-business",
     "package": "google_business_mcp",
     "auth": "oauth",
-    "version": "v1.2.0",
+    "version": "v1.3.0",
     "api_base": null
   },
   "tools": {
@@ -19,11 +19,11 @@
             "description": "Lists the locations for the specified account, optionally filtered and sorted, and returns the matching Location objects with pagination info.",
             "tier": "GET",
             "params": [
-              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from, in the form accounts/{accountId}. Get valid account names from list_accounts. If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
+              { "name": "parent", "type": "string", "required": true, "description": "The name of the account to fetch locations from, in the form accounts/{accountId}. Get valid account names from list_accounts. Use the - wildcard (accounts/-) to include indirectly owned listings (owned or managed via a group). If the parent Account is of type PERSONAL, only directly-owned Locations are returned; otherwise all accessible locations (direct or indirect) are returned." },
               { "name": "readMask", "type": "string", "required": true, "description": "Comma-separated list of fully qualified field names to return. Example: \"user.displayName,photo\"." },
               { "name": "pageSize", "type": "integer", "required": false, "description": "How many locations to fetch per page. Default 10, minimum 1, maximum 100." },
               { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page; returned by a previous call when more locations exist than fit the page size." },
-              { "name": "filter", "type": "string", "required": false, "description": "Filter constraining which locations to return. Empty means no constraints (all locations, paginated). See Google's \"Work with Location Data\" guide for valid fields." },
+              { "name": "filter", "type": "string", "required": false, "description": "Filter constraining which locations to return. Empty means no constraints (all locations, paginated). Syntax: <field><operator><value> with operator = (token match) or : (substring match); quote string values; combine restrictions with AND, and use OR only between restrictions on the same field. Fields: title, categories (category ID without gcid:), phone_numbers.primary_phone (E.164), storefront_address.region_code, storefront_address.administrative_area, storefront_address.locality, storefront_address.postal_code, metadata.place_id, openInfo.status (OPEN, CLOSED_PERMANENTLY), labels (exact, case-sensitive match), storeCode, and the function distance(latlng, geopoint(<lat>, <lng>))<<distance>. Example: title:\"Bajis\"." },
               { "name": "orderBy", "type": "string", "required": false, "description": "Comma-separated sort fields (SQL syntax). Default ascending; append \" desc\" for descending. Valid fields: title, storeCode. E.g. \"title, storeCode desc\"." }
             ],
             "response_fields": [
@@ -35,12 +35,12 @@
           },
           "create_location": {
             "endpoint": "POST https://mybusinessbusinessinformation.googleapis.com/v1/accounts/{accountsId}/locations",
-            "description": "Creates a new Location that will be owned by the logged-in user, and returns the newly created Location.",
+            "description": "Creates a new Location that will be owned by the logged-in user, and returns the newly created Location. A newly created location is unverified and not publicly visible on Google Search or Maps until it is verified.",
             "tier": "CREATE",
             "params": [
               { "name": "parent", "type": "string", "required": true, "description": "The name of the account in which to create this location, in the form accounts/{accountId}. Get valid account names from list_accounts." },
-              { "name": "location", "type": "object", "required": true, "description": "Location object to create. Full schema: see get_location. Required sub-fields per the Location schema: title (and primaryCategory within categories if categories are set)." },
-              { "name": "validateOnly", "type": "boolean", "required": false, "description": "If true, validates the request without actually creating the location." },
+              { "name": "location", "type": "object", "required": true, "description": "Location object to create. Full schema: see get_location. Required sub-fields per the Location schema: title (and primaryCategory within categories if categories are set). Google validates storefrontAddress against Business Profile postal-address requirements, which are stricter than community-sourced Maps data. regularHours.periods[].openTime / closeTime are TimeOfDay objects, e.g. {\"hours\": 9}; \"09:00\" strings are rejected. categories.primaryCategory.name accepts both gcid:software_company and categories/gcid:software_company (as returned by list_categories)." },
+              { "name": "validateOnly", "type": "boolean", "required": false, "description": "If true, validates the request without actually creating the location. Google recommends calling with validateOnly=true first to confirm required fields are present and the address is properly formatted." },
               { "name": "requestId", "type": "string", "required": false, "description": "A unique request ID for the server to detect duplicate requests. UUIDs recommended. Max 50 characters." }
             ],
             "response_fields": [
@@ -181,9 +181,8 @@
             "description": "Updates attributes for a given location per the given attribute mask, and returns the updated Attributes.",
             "tier": "UPDATE",
             "params": [
-              { "name": "attributes.name", "type": "string", "required": true, "description": "Google identifier for this location, in the form locations/{locationId}/attributes." },
+              { "name": "name", "type": "string", "required": true, "description": "Google identifier for this location, in the form locations/{locationId}/attributes. Used as both the path name (attributes.name) and the request body's name, which carry the same value, so it is supplied only once." },
               { "name": "attributeMask", "type": "string", "required": true, "description": "Attribute names (as attributes/{attribute}) to update. Updates: every attribute you want updated must be in both attributes and attributeMask — attributes in attributes but not in attributeMask are ignored. Deletes: to delete an attribute, put it in attributeMask with no matching entry in attributes; to delete all attributes, look up all applicable attributes and add them to attributeMask with an empty attributes field. Comma-separated fully qualified field names." },
-              { "name": "name", "type": "string", "required": true, "description": "Google identifier for this location, in the form locations/{locationId}/attributes (body field, same value as attributes.name)." },
               { "name": "attributes", "type": "array", "required": false, "description": "The attributes to set (each with name, valueType, values, repeatedEnumValue, uriValues). May be empty when deleting all attributes via attributeMask." }
             ],
             "response_fields": [
@@ -259,12 +258,12 @@
         "tools": {
           "list_categories": {
             "endpoint": "GET https://mybusinessbusinessinformation.googleapis.com/v1/categories",
-            "description": "Returns a list of business categories matched by the front of the category name (e.g. 'food' matches 'Food Court' but not 'Fast Food Restaurant').",
+            "description": "Returns a list of business categories, matched by the front of the category name (e.g. 'food' matches 'Food Court' but not 'Fast Food Restaurant').",
             "tier": "GET",
             "params": [
               { "name": "regionCode", "type": "string", "required": true, "description": "The ISO 3166-1 alpha-2 country code." },
               { "name": "languageCode", "type": "string", "required": true, "description": "The BCP 47 code of the language." },
-              { "name": "filter", "type": "string", "required": false, "description": "Filter string from the user; the only supported field is `displayName`, e.g. `filter=displayName=foo`." },
+              { "name": "filter", "type": "string", "required": false, "description": "Filter string from the user; the only supported field is `displayName`, e.g. `filter=displayName=foo`. Quote values that contain spaces: `displayName=\"software company\"` (an unquoted multi-word value is rejected with 400)." },
               { "name": "pageSize", "type": "integer", "required": false, "description": "How many categories to fetch per page. Default is 100, minimum is 1, maximum is 100." },
               { "name": "pageToken", "type": "string", "required": false, "description": "If specified, fetches the next page of categories." },
               { "name": "view", "type": "enum (CategoryView)", "required": true, "description": "Specifies which parts of the Category resource to return. Values: `CATEGORY_VIEW_UNSPECIFIED` (equivalent to `BASIC`), `BASIC` (only `displayName`, `category_id`, `languageCode`), `FULL` (all fields)." }
@@ -302,7 +301,7 @@
             "description": "Returns the list of attributes that would be available for a location with the given primary category and country.",
             "tier": "GET",
             "params": [
-              { "name": "parent", "type": "string", "required": false, "description": "Resource name of the location to look up available attributes for. If set, categoryName, regionCode, languageCode and showAll are not required and must not be set." },
+              { "name": "parent", "type": "string", "required": false, "description": "Resource name of the location to look up available attributes for. If set, categoryName, regionCode, languageCode and showAll are not required and must not be set. Format: locations/{location_id}." },
               { "name": "categoryName", "type": "string", "required": false, "description": "The primary category stable ID to find available attributes. Must be of the format categories/{category_id}." },
               { "name": "regionCode", "type": "string", "required": false, "description": "The ISO 3166-1 alpha-2 country code to find available attributes." },
               { "name": "languageCode", "type": "string", "required": false, "description": "The BCP 47 code of language to get attribute display names in. Falls back to English if unavailable." },
@@ -360,7 +359,7 @@
             "tier": "GET",
             "params": [
               { "name": "name", "type": "string", "required": true, "description": "The location for which the time series should be fetched. Format: `locations/{locationId}` where `locationId` is an unobfuscated listing id." },
-              { "name": "dailyMetric", "type": "enum (DailyMetric)", "required": true, "description": "The metric to retrieve time series for. One of: `DAILY_METRIC_UNKNOWN`, `BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, `BUSINESS_IMPRESSIONS_DESKTOP_SEARCH`, `BUSINESS_IMPRESSIONS_MOBILE_MAPS`, `BUSINESS_IMPRESSIONS_MOBILE_SEARCH`, `BUSINESS_CONVERSATIONS`, `BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, `BUSINESS_BOOKINGS`, `BUSINESS_FOOD_ORDERS`, `BUSINESS_FOOD_MENU_CLICKS`." },
+              { "name": "dailyMetric", "type": "enum (DailyMetric)", "required": true, "description": "The metric to retrieve time series for. One of: `BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, `BUSINESS_IMPRESSIONS_DESKTOP_SEARCH`, `BUSINESS_IMPRESSIONS_MOBILE_MAPS`, `BUSINESS_IMPRESSIONS_MOBILE_SEARCH`, `BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, `MESSAGING_CLICKS` (clicks on the messaging button, e.g. WhatsApp), `BUSINESS_BOOKINGS`, `BUSINESS_FOOD_MENU_CLICKS`. Deprecated upstream: `BUSINESS_CONVERSATIONS`, `BUSINESS_FOOD_ORDERS`. `DAILY_METRIC_UNKNOWN` is the default unknown value." },
               { "name": "dailyRange", "type": "object (DailyRange)", "required": true, "description": "The timerange to fetch. `{ \"startDate\": {\"year\",\"month\",\"day\"}, \"endDate\": {\"year\",\"month\",\"day\"} }`, both inclusive." },
               { "name": "dailySubEntityType", "type": "object (DailySubEntityType)", "required": false, "description": "The sub-entity type/id the time series relates to. Currently no `DailyMetric` supports this (breakdown not available). Union of `dayOfWeek` (enum) or `timeOfDay` (`{hours, minutes, seconds, nanos}`)." }
             ],
@@ -376,7 +375,7 @@
             "tier": "GET",
             "params": [
               { "name": "location", "type": "string", "required": true, "description": "The location for which the time series should be fetched. Format: `locations/{locationId}` where `locationId` is an unobfuscated listing id." },
-              { "name": "dailyMetrics[]", "type": "enum (DailyMetric)", "required": true, "description": "The metrics to retrieve time series for. Same enum values as `get_daily_metrics_time_series` (`WEBSITE_CLICKS`, `CALL_CLICKS`, `BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, etc.). Repeat this parameter for multiple metrics." },
+              { "name": "dailyMetrics[]", "type": "enum (DailyMetric)", "required": true, "description": "The metrics to retrieve time series for. One of: `BUSINESS_IMPRESSIONS_DESKTOP_MAPS`, `BUSINESS_IMPRESSIONS_DESKTOP_SEARCH`, `BUSINESS_IMPRESSIONS_MOBILE_MAPS`, `BUSINESS_IMPRESSIONS_MOBILE_SEARCH`, `BUSINESS_DIRECTION_REQUESTS`, `CALL_CLICKS`, `WEBSITE_CLICKS`, `MESSAGING_CLICKS` (clicks on the messaging button, e.g. WhatsApp), `BUSINESS_BOOKINGS`, `BUSINESS_FOOD_MENU_CLICKS`. Deprecated upstream: `BUSINESS_CONVERSATIONS`, `BUSINESS_FOOD_ORDERS`. `DAILY_METRIC_UNKNOWN` is the default unknown value. Repeat this parameter for multiple metrics." },
               { "name": "dailyRange", "type": "object (DailyRange)", "required": true, "description": "The timerange to fetch. `{ \"startDate\": {\"year\",\"month\",\"day\"}, \"endDate\": {\"year\",\"month\",\"day\"} }`, both inclusive." }
             ],
             "response_fields": [

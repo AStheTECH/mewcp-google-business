@@ -3,8 +3,14 @@
 import logging
 import os
 
-SERVER_VERSION = "v1.2.0"
-BREAKING_CHANGES: list[dict] = []
+SERVER_VERSION = "v1.3.0"
+BREAKING_CHANGES: list[dict] = [
+    {
+        "tool": "update_location_attributes",
+        "change": "parameter removed: 'attributes_name' (duplicated 'name')",
+        "migration": "Drop 'attributes_name' and pass locations/{locationId}/attributes once as 'name'",
+    },
+]
 
 SCOPES = [
     "https://www.googleapis.com/auth/business.manage",
