@@ -51,6 +51,8 @@ def register_locations_tools(mcp: FastMCP) -> None:
         parent: str = Field(
             description="The name of the account to fetch locations from, in the form "
             "accounts/{accountId}. Get valid account names from list_accounts. "
+            "Use the - wildcard (accounts/-) to include indirectly owned listings "
+            "(owned or managed via a group). "
             "If the parent Account is of type PERSONAL, only "
             "directly-owned Locations are returned; "
             "otherwise all accessible locations (direct or indirect) are returned."
@@ -71,8 +73,15 @@ def register_locations_tools(mcp: FastMCP) -> None:
         filter_: str | None = Field(
             default=None,
             description="Filter constraining which locations to return. Empty means no "
-            'constraints (all locations, paginated). See Google\'s "Work with Location Data" '
-            "guide for valid fields.",
+            "constraints (all locations, paginated). Syntax: <field><operator><value> with "
+            "operator = (token match) or : (substring match); quote string values; combine "
+            "restrictions with AND, and use OR only between restrictions on the same field. "
+            "Fields: title, categories (category ID without gcid:), phone_numbers.primary_phone "
+            "(E.164), storefront_address.region_code, storefront_address.administrative_area, "
+            "storefront_address.locality, storefront_address.postal_code, metadata.place_id, "
+            "openInfo.status (OPEN, CLOSED_PERMANENTLY), labels (exact, case-sensitive match), "
+            "storeCode, and the function distance(latlng, geopoint(<lat>, <lng>))<<distance>. "
+            'Example: title:"Bajis".',
         ),
         order_by: str | None = Field(
             default=None,
@@ -101,7 +110,8 @@ def register_locations_tools(mcp: FastMCP) -> None:
         name="create_location",
         description=(
             "Creates a new Location that will be owned by the logged-in user, and returns "
-            "the newly created Location."
+            "the newly created Location. A newly created location is unverified and not "
+            "publicly visible on Google Search or Maps until it is verified."
         ),
         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
@@ -111,12 +121,20 @@ def register_locations_tools(mcp: FastMCP) -> None:
             "form accounts/{accountId}. Get valid account names from list_accounts."
         ),
         location: dict = Field(
-            description="Location object to create. Required sub-fields: title (and "
-            "primaryCategory within categories if categories are set)."
+            description="Location object to create. Full schema: see get_location. Required "
+            "sub-fields: title (and primaryCategory within categories if categories are set). "
+            "Google validates storefrontAddress against Business Profile postal-address "
+            "requirements, which are stricter than community-sourced Maps data. "
+            "regularHours.periods[].openTime / closeTime are TimeOfDay objects, e.g. "
+            '{"hours": 9}; "09:00" strings are rejected. categories.primaryCategory.name '
+            "accepts both gcid:software_company and categories/gcid:software_company (as "
+            "returned by list_categories)."
         ),
         validate_only: bool | None = Field(
             default=None,
-            description="If true, validates the request without actually creating the location.",
+            description="If true, validates the request without actually creating the location. "
+            "Google recommends calling with validate_only=true first to confirm required fields "
+            "are present and the address is properly formatted.",
         ),
         request_id: str | None = Field(
             default=None,
@@ -188,8 +206,8 @@ def register_locations_tools(mcp: FastMCP) -> None:
         location: dict = Field(description="Location object carrying the updated field values."),
         validate_only: bool | None = Field(
             default=None,
-            description="If true, validates the request without actually updating; response "
-            "is empty unless there are validation errors.",
+            description="If true, validates the request without actually updating anything; "
+            "the returned after is then empty rather than the updated location.",
         ),
     ) -> LocationUpdateResult:
         tlog = ToolLogger(logger, "update_location")
@@ -294,18 +312,18 @@ def register_locations_tools(mcp: FastMCP) -> None:
         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
     def update_location_attributes(
-        attributes_name: str = Field(
-            description="Google identifier for this location, in the form "
-            "locations/{locationId}/attributes."
-        ),
-        attribute_mask: str = Field(
-            description="Attribute names (as attributes/{attribute}) to update. Every "
-            "attribute you want updated must be in both attributes and attributeMask. To "
-            "delete an attribute, put it in attributeMask with no matching entry in attributes."
-        ),
         name: str = Field(
             description="Google identifier for this location, in the form "
-            "locations/{locationId}/attributes (body field, same value as attributes.name)."
+            "locations/{locationId}/attributes. Used for both the request path and the "
+            "request body's name, which carry the same value, so it is supplied only once."
+        ),
+        attribute_mask: str = Field(
+            description="Comma-separated attribute names (as attributes/{attribute}) to update. "
+            "Updates: every attribute you want updated must be in both attributes and "
+            "attribute_mask; attributes not in attribute_mask are ignored. Deletes: to delete "
+            "an attribute, put it in attribute_mask with no matching entry in attributes; to "
+            "delete all attributes, add all applicable attributes to attribute_mask with an "
+            "empty attributes list."
         ),
         attributes: list[dict] | None = Field(
             default=None,
@@ -317,7 +335,7 @@ def register_locations_tools(mcp: FastMCP) -> None:
         tlog = ToolLogger(logger, "update_location_attributes")
         try:
             svc = service.get_business_information_service()
-            before = svc.locations().getAttributes(name=attributes_name).execute()
+            before = svc.locations().getAttributes(name=name).execute()
             after = svc.locations().updateAttributes(
                 name=name, attributeMask=attribute_mask,
                 body={"name": name, "attributes": attributes or []},

@@ -164,7 +164,7 @@ def register_accounts_tools(mcp: FastMCP) -> None:
         validate_only: bool | None = Field(
             default=None,
             description="If true, validates the request without actually updating the account; "
-            "the returned `after` is then only a preview of the result. Omit to apply the update.",
+            "the returned `after` then does not reflect a real change. Omit to apply the update.",
         ),
     ) -> AccountUpdateResult:
         tlog = ToolLogger(logger, "update_account")
