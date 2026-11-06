@@ -4,7 +4,7 @@
     "name": "mewcp-google-business",
     "package": "google_business_mcp",
     "auth": "oauth",
-    "version": "v1.4.0",
+    "version": "v1.5.0",
     "api_base": null
   },
   "tools": {
@@ -544,7 +544,7 @@
       },
       "local_posts": {
         "file": "local_posts_tools.py",
-        "doc_source": ["list_local_posts.md", "get_local_post.md", "create_local_post.md", "update_local_post.md", "delete_local_post.md", "report_local_post_insights.md"],
+        "doc_source": ["list_local_posts.md", "get_local_post.md", "create_local_post.md", "update_local_post.md", "delete_local_post.md"],
         "register_fn": "register_local_posts_tools",
         "tools": {
           "list_local_posts": {
@@ -658,25 +658,6 @@
             "response_fields": [],
             "schema": { "data": "LocalPostDeleteData", "result": "LocalPostDeleteResult" },
             "doc_file": "local_posts/delete_local_post.md"
-          },
-          "report_local_post_insights": {
-            "endpoint": "POST https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts:reportInsights",
-            "description": "Returns insights for a set of local posts associated with a single listing. Limited to 100 localPostNames per call.",
-            "tier": "GET",
-            "params": [
-              { "name": "name", "type": "string", "required": true, "description": "The location, in the form `accounts/{accountId}/locations/{locationId}`." },
-              { "name": "localPostNames", "type": "array<string>", "required": true, "description": "Posts to fetch insights for; all must belong to the location in name. Max 100." },
-              { "name": "basicRequest.metricRequests", "type": "array<object (MetricRequest)>", "required": false, "description": "{metric, options[]}." },
-              { "name": "basicRequest.timeRange.startTime", "type": "string", "required": false, "description": "Range start (inclusive), RFC3339 UTC. Max range 18 months." },
-              { "name": "basicRequest.timeRange.endTime", "type": "string", "required": false, "description": "Range end (exclusive), RFC3339 UTC." }
-            ],
-            "response_fields": [
-              { "name": "name", "type": "string" },
-              { "name": "localPostMetrics", "type": "array<object (LocalPostMetrics)>" },
-              { "name": "timeZone", "type": "string" }
-            ],
-            "schema": { "data": "LocalPostInsightsData", "result": "LocalPostInsightsResult" },
-            "doc_file": "local_posts/report_local_post_insights.md"
           }
         }
       },

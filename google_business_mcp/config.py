@@ -3,12 +3,17 @@
 import logging
 import os
 
-SERVER_VERSION = "v1.4.0"
+SERVER_VERSION = "v1.5.0"
 BREAKING_CHANGES: list[dict] = [
     {
         "tool": "update_location_attributes",
         "change": "parameter removed: 'attributes_name' (duplicated 'name')",
         "migration": "Drop 'attributes_name' and pass locations/{locationId}/attributes once as 'name'",
+    },
+    {
+        "tool": "report_local_post_insights",
+        "change": "tool removed: Google discontinued localPosts.reportInsights on 2023-02-20",
+        "migration": "No replacement for per-post metrics; use get_daily_metrics_time_series for location-level metrics",
     },
 ]
 

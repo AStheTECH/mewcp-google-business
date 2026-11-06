@@ -1,5 +1,5 @@
 """Schemas for the local_posts tool group: list_local_posts, get_local_post, create_local_post,
-update_local_post, delete_local_post, report_local_post_insights."""
+update_local_post, delete_local_post."""
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -74,25 +74,3 @@ class LocalPostDeleteData(BaseModel):
 
 class LocalPostDeleteResult(ToolResult):
     data: LocalPostDeleteData | None = None
-
-
-class LocalPostMetricsData(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    localPostName: str | None = None
-    metricValues: list[dict] = Field(
-        default_factory=list,
-        description="MetricValue objects: {metric, totalValue, dimensionalValues}.",
-    )
-
-
-class LocalPostInsightsData(BaseModel):
-    model_config = ConfigDict(extra="allow")
-
-    name: str | None = None
-    localPostMetrics: list[LocalPostMetricsData] = Field(default_factory=list)
-    timeZone: str | None = Field(default=None, description="IANA time zone ID of the location.")
-
-
-class LocalPostInsightsResult(ToolResult):
-    data: LocalPostInsightsData | None = None

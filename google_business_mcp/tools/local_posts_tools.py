@@ -1,5 +1,5 @@
 """Local posts group (Google My Business API v4): list_local_posts, get_local_post,
-create_local_post, update_local_post, delete_local_post, report_local_post_insights."""
+create_local_post, update_local_post, delete_local_post."""
 
 import logging
 
@@ -17,8 +17,6 @@ from ..schemas.local_posts import (
     LocalPostDeleteResult,
     LocalPostGetData,
     LocalPostGetResult,
-    LocalPostInsightsData,
-    LocalPostInsightsResult,
     LocalPostListData,
     LocalPostListResult,
     LocalPostUpdateData,
@@ -253,73 +251,3 @@ def register_local_posts_tools(mcp: FastMCP) -> None:
             return LocalPostDeleteResult(success=True, statusCode=200, data=LocalPostDeleteData())
         except Exception as exc:
             return _handle_request_exc(LocalPostDeleteResult, tlog, exc)
-
-    @mcp.tool(
-        name="report_local_post_insights",
-        description=(
-            "Returns performance metrics (Search views, call-to-action clicks) for up to 100 "
-            "local posts of one location, with per-post metric values and the location's time "
-            "zone. Time ranges can reach back at most 18 months, and days close to the "
-            "request date may still be missing data."
-        ),
-        annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
-    )
-    def report_local_post_insights(
-        name: str = Field(
-            description="The location the posts belong to, in the form "
-            "accounts/{accountId}/locations/{locationId}."
-        ),
-        local_post_names: list[str] = Field(
-            description="1 to 100 local post names, each "
-            "accounts/{accountId}/locations/{locationId}/localPosts/{localPostId} and "
-            "belonging to the location in name."
-        ),
-        metric_requests: list[dict] | None = Field(
-            default=None,
-            description="Metrics to return, each {\"metric\": LOCAL_POST_VIEWS_SEARCH | "
-            "LOCAL_POST_ACTIONS_CALL_TO_ACTION | ALL, \"options\": [AGGREGATED_TOTAL | "
-            "AGGREGATED_DAILY]}. Options default to AGGREGATED_TOTAL. Omit to request no "
-            "basic metrics.",
-        ),
-        start_time: str | None = Field(
-            default=None,
-            description="Start of the range (inclusive), RFC3339 UTC, e.g. 2026-01-01T00:00:00Z. "
-            "Omit to leave the range start unset.",
-        ),
-        end_time: str | None = Field(
-            default=None,
-            description="End of the range (exclusive), RFC3339 UTC, e.g. 2026-02-01T00:00:00Z. "
-            "Omit to leave the range end unset.",
-        ),
-    ) -> LocalPostInsightsResult:
-        tlog = ToolLogger(logger, "report_local_post_insights")
-
-        if msg := _v4_name_error("name", name, "location"):
-            return _err(LocalPostInsightsResult, tlog, "VALIDATION_ERROR", msg, 400)
-        if not (1 <= len(local_post_names) <= 100):
-            return _err(LocalPostInsightsResult, tlog, "VALIDATION_ERROR",
-                "local_post_names must contain between 1 and 100 posts", 400)
-        for post in local_post_names:
-            if msg := _v4_name_error("local_post_names entry", post, "local_post"):
-                return _err(LocalPostInsightsResult, tlog, "VALIDATION_ERROR", msg, 400)
-            if not post.startswith(f"{name}/localPosts/"):
-                return _err(LocalPostInsightsResult, tlog, "VALIDATION_ERROR",
-                    f"local post {post!r} does not belong to location {name!r}", 400)
-
-        body: dict = {"localPostNames": local_post_names}
-        basic: dict = {}
-        if metric_requests is not None:
-            basic["metricRequests"] = metric_requests
-        time_range = {k: v for k, v in {"startTime": start_time, "endTime": end_time}.items() if v}
-        if time_range:
-            basic["timeRange"] = time_range
-        if basic:
-            body["basicRequest"] = basic
-
-        try:
-            resp = service.v4_request("POST", f"{name}/localPosts:reportInsights", json=body)
-            tlog.success()
-            return LocalPostInsightsResult(
-                success=True, statusCode=200, data=LocalPostInsightsData(**resp))
-        except Exception as exc:
-            return _handle_request_exc(LocalPostInsightsResult, tlog, exc)
