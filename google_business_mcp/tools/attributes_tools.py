@@ -34,7 +34,7 @@ def register_attributes_tools(mcp: FastMCP) -> None:
             description=(
                 "Resource name of the location to look up available attributes for. If set, "
                 "category_name, region_code, language_code and show_all are not required and "
-                "must not be set."
+                "must not be set. Format: locations/{location_id}."
             ),
         ),
         category_name: str | None = Field(

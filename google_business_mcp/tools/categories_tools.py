@@ -43,7 +43,9 @@ def register_categories_tools(mcp: FastMCP) -> None:
             default=None,
             description=(
                 "Filter string from the user; the only supported field is `displayName`, "
-                "e.g. `filter=displayName=foo`."
+                "e.g. `filter=displayName=foo`. Quote values that contain spaces: "
+                "`displayName=\"software company\"` (an unquoted multi-word value is rejected "
+                "with 400)."
             ),
         ),
         page_size: int | None = Field(
