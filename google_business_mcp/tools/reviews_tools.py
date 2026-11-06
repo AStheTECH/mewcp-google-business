@@ -87,8 +87,10 @@ def register_reviews_tools(mcp: FastMCP) -> None:
         name="get_review",
         description=(
             "Returns the specified review of a verified location, including the reviewer, "
-            "star rating, comment, media and the owner's reply with its moderation state. "
-            "Fails with statusCode 404 if the review does not exist or has been deleted."
+            "star rating, comment, media and the owner's reply text. Google does not return the "
+            "reply's reviewReplyState or policyViolation from this endpoint (they come back null); "
+            "use list_reviews or batch_get_reviews to see whether a reply is APPROVED, PENDING or "
+            "REJECTED. Fails with statusCode 404 if the review does not exist or has been deleted."
         ),
         annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
     )
@@ -175,8 +177,10 @@ def register_reviews_tools(mcp: FastMCP) -> None:
         name="update_review_reply",
         description=(
             "Sets the owner's public reply to the specified review of a verified location, "
-            "creating the reply if none exists, and returns the reply with its moderation state "
-            "(PENDING, APPROVED, or REJECTED with a policy violation). Google's Business Profile "
+            "creating the reply if none exists, and returns the saved reply text and time. The "
+            "returned reviewReplyState is null because Google does not report moderation state "
+            "here; call list_reviews or batch_get_reviews afterwards to see whether the reply is "
+            "APPROVED, PENDING or REJECTED with a policy violation. Google's Business Profile "
             "API policies prohibit automating or triggering review replies without the business "
             "owner's prior specific and express consent, and replies must follow Google's "
             "prohibited and restricted content policies. Read the review first, write a reply "

@@ -187,7 +187,9 @@ def register_accounts_tools(mcp: FastMCP) -> None:
         name="list_account_admins",
         description=(
             "Lists the admins of the specified account and returns each admin's resource name, "
-            "name (or invitee email while pending), role, and whether their invitation is still pending."
+            "name (or invitee email while pending), role, and whether their invitation is still "
+            "pending. Personal accounts have no admins: Google rejects them with statusCode 400 "
+            "(\"A PERSON_ACCOUNT cannot have admins\"); use list_location_admins for a location's admins."
         ),
         annotations=ToolAnnotations(readOnlyHint=True, openWorldHint=True),
     )
