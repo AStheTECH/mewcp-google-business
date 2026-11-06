@@ -47,6 +47,11 @@ class ReviewData(BaseModel):
     reviewMediaItems: list[dict] | None = Field(
         default=None, description="{thumbnailUrl, thumbnailLabel, videoUrl}."
     )
+    reviewReplyUrl: str | None = Field(
+        default=None,
+        description="Business Profile dashboard link for replying to this review. Returned by "
+        "Google but not in its reference docs.",
+    )
 
 
 class ReviewListData(BaseModel):

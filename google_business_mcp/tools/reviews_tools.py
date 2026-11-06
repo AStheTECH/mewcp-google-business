@@ -174,12 +174,17 @@ def register_reviews_tools(mcp: FastMCP) -> None:
     @mcp.tool(
         name="update_review_reply",
         description=(
-            "Sets the owner's reply to the specified review of a verified location, creating "
-            "the reply if none exists, and returns the reply with its moderation state "
-            "(PENDING, APPROVED, or REJECTED with a policy violation). NOTE: this overwrites "
-            "the current reply — the original state is not stored after the call. The "
-            "response includes both the before and after state so you have a full record of "
-            "what changed."
+            "Sets the owner's public reply to the specified review of a verified location, "
+            "creating the reply if none exists, and returns the reply with its moderation state "
+            "(PENDING, APPROVED, or REJECTED with a policy violation). Google's Business Profile "
+            "API policies prohibit automating or triggering review replies without the business "
+            "owner's prior specific and express consent, and replies must follow Google's "
+            "prohibited and restricted content policies. Read the review first, write a reply "
+            "specific to what the reviewer said, show the draft to the user and post it only "
+            "once they approve it. Generic or copy-pasted replies across many reviews can be "
+            "rejected (e.g. REPETITIVE or GENERIC_QUALITY). NOTE: this overwrites the current "
+            "reply — the original state is not stored after the call. The response includes "
+            "both the before and after state so you have a full record of what changed."
         ),
         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
@@ -189,7 +194,9 @@ def register_reviews_tools(mcp: FastMCP) -> None:
             "accounts/{accountId}/locations/{locationId}/reviews/{reviewId} (without /reply)."
         ),
         comment: str = Field(
-            description="The reply text, plain text with markups, at most 4096 bytes."
+            description="The reply text the user approved, plain text with markups, at most "
+            "4096 bytes. It appears publicly under the review, so address the points the "
+            "reviewer raised rather than a stock thank-you."
         ),
     ) -> ReviewReplyUpdateResult:
         tlog = ToolLogger(logger, "update_review_reply")

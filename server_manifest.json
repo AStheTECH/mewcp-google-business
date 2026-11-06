@@ -701,7 +701,8 @@
               { "name": "createTime", "type": "string" },
               { "name": "updateTime", "type": "string" },
               { "name": "reviewReply", "type": "object (ReviewReply)" },
-              { "name": "reviewMediaItems", "type": "array<object (ReviewMediaItem)>" }
+              { "name": "reviewMediaItems", "type": "array<object (ReviewMediaItem)>" },
+              { "name": "reviewReplyUrl", "type": "string" }
             ],
             "schema": { "data": "ReviewGetData", "result": "ReviewGetResult" },
             "doc_file": "reviews/get_review.md"
@@ -726,7 +727,7 @@
           },
           "update_review_reply": {
             "endpoint": "PUT https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/reviews/{reviewsId}/reply",
-            "description": "Updates the reply to the specified review; a reply is created if one does not exist. Only valid if the location is verified.",
+            "description": "Updates the reply to the specified review; a reply is created if one does not exist. Only valid if the location is verified. Replies require the owner's prior express consent and must follow Google's prohibited and restricted content policies.",
             "tier": "UPDATE",
             "params": [
               { "name": "name", "type": "string", "required": true, "description": "The review, in the form `accounts/{accountId}/locations/{locationId}/reviews/{reviewId}`." },
