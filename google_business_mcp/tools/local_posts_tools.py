@@ -106,8 +106,8 @@ def register_local_posts_tools(mcp: FastMCP) -> None:
         description=(
             "Creates a local post on the specified location and returns the new LocalPost. "
             "EVENT and OFFER posts require event (title and a full schedule), offer should "
-            "only be set on OFFER posts, call_to_action is ignored on OFFER posts, and ALERT "
-            "posts are not always available for authoring."
+            "only be set on OFFER posts, call_to_action has no effect on OFFER posts, and ALERT "
+            "posts can be unavailable for authoring."
         ),
         annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=False, openWorldHint=True),
     )
@@ -119,7 +119,7 @@ def register_local_posts_tools(mcp: FastMCP) -> None:
         topic_type: str = Field(
             description="Post type: STANDARD (summary and images), EVENT (adds an event), "
             "OFFER (adds an event and offer details such as a coupon code), or ALERT "
-            "(high-priority announcement; not always available)."
+            "(high-priority announcement; can be unavailable for authoring)."
         ),
         summary: str | None = Field(
             default=None,
@@ -133,7 +133,7 @@ def register_local_posts_tools(mcp: FastMCP) -> None:
             default=None,
             description="Button shown on the post: {\"actionType\": BOOK | ORDER | SHOP | "
             "LEARN_MORE | SIGN_UP | CALL, \"url\": \"https://...\"}. Leave url out for CALL. "
-            "GET_OFFER is deprecated — use topic_type OFFER. Ignored for OFFER posts. "
+            "GET_OFFER is deprecated — use topic_type OFFER. Has no effect on OFFER posts. "
             "Omit for no button.",
         ),
         event: dict | None = Field(
