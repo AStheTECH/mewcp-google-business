@@ -4,7 +4,7 @@
     "name": "mewcp-google-business",
     "package": "google_business_mcp",
     "auth": "oauth",
-    "version": "v1.3.0",
+    "version": "v1.4.0",
     "api_base": null
   },
   "tools": {
@@ -539,6 +539,237 @@
             ],
             "schema": { "data": "LocationAdminListData", "result": "LocationAdminListResult" },
             "doc_file": "accounts/list_location_admins.md"
+          }
+        }
+      },
+      "local_posts": {
+        "file": "local_posts_tools.py",
+        "doc_source": ["list_local_posts.md", "get_local_post.md", "create_local_post.md", "update_local_post.md", "delete_local_post.md", "report_local_post_insights.md"],
+        "register_fn": "register_local_posts_tools",
+        "tools": {
+          "list_local_posts": {
+            "endpoint": "GET https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts",
+            "description": "Returns a list of local posts associated with a location.",
+            "tier": "GET",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The location, in the form `accounts/{accountId}/locations/{locationId}`." },
+              { "name": "pageSize", "type": "integer", "required": false, "description": "Local posts per page, 1-100. Default 20." },
+              { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page of local posts." }
+            ],
+            "response_fields": [
+              { "name": "localPosts", "type": "array<object (LocalPost)>" },
+              { "name": "nextPageToken", "type": "string" }
+            ],
+            "schema": { "data": "LocalPostListData", "result": "LocalPostListResult" },
+            "doc_file": "local_posts/list_local_posts.md"
+          },
+          "get_local_post": {
+            "endpoint": "GET https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts/{localPostsId}",
+            "description": "Gets the specified local post; returns NOT_FOUND if the local post does not exist.",
+            "tier": "GET",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The local post, in the form `accounts/{accountId}/locations/{locationId}/localPosts/{localPostId}`." }
+            ],
+            "response_fields": [
+              { "name": "name", "type": "string" },
+              { "name": "languageCode", "type": "string" },
+              { "name": "summary", "type": "string" },
+              { "name": "callToAction", "type": "object (CallToAction)" },
+              { "name": "createTime", "type": "string" },
+              { "name": "updateTime", "type": "string" },
+              { "name": "event", "type": "object (LocalPostEvent)" },
+              { "name": "state", "type": "string" },
+              { "name": "media", "type": "array<object (MediaItem)>" },
+              { "name": "searchUrl", "type": "string" },
+              { "name": "topicType", "type": "string" },
+              { "name": "alertType", "type": "string" },
+              { "name": "offer", "type": "object (LocalPostOffer)" }
+            ],
+            "schema": { "data": "LocalPostGetData", "result": "LocalPostGetResult" },
+            "doc_file": "local_posts/get_local_post.md"
+          },
+          "create_local_post": {
+            "endpoint": "POST https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts",
+            "description": "Creates a new local post associated with the specified location, and returns it.",
+            "tier": "CREATE",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The location, in the form `accounts/{accountId}/locations/{locationId}`." },
+              { "name": "topicType", "type": "string", "required": true, "description": "STANDARD, EVENT, OFFER, or ALERT." },
+              { "name": "summary", "type": "string", "required": false, "description": "Description/body of the local post." },
+              { "name": "languageCode", "type": "string", "required": false, "description": "The language of the local post." },
+              { "name": "callToAction", "type": "object (CallToAction)", "required": false, "description": "{actionType, url}. Ignored for topic type OFFER." },
+              { "name": "event", "type": "object (LocalPostEvent)", "required": false, "description": "{title, schedule}. Required for topic types EVENT and OFFER." },
+              { "name": "media", "type": "array<object (MediaItem)>", "required": false, "description": "sourceUrl is the only supported data field." },
+              { "name": "alertType", "type": "string", "required": false, "description": "Only for topicType ALERT." },
+              { "name": "offer", "type": "object (LocalPostOffer)", "required": false, "description": "Only set when topicType is OFFER." }
+            ],
+            "response_fields": [
+              { "name": "name", "type": "string" },
+              { "name": "languageCode", "type": "string" },
+              { "name": "summary", "type": "string" },
+              { "name": "callToAction", "type": "object (CallToAction)" },
+              { "name": "createTime", "type": "string" },
+              { "name": "updateTime", "type": "string" },
+              { "name": "event", "type": "object (LocalPostEvent)" },
+              { "name": "state", "type": "string" },
+              { "name": "media", "type": "array<object (MediaItem)>" },
+              { "name": "searchUrl", "type": "string" },
+              { "name": "topicType", "type": "string" },
+              { "name": "alertType", "type": "string" },
+              { "name": "offer", "type": "object (LocalPostOffer)" }
+            ],
+            "schema": { "data": "LocalPostCreateData", "result": "LocalPostCreateResult" },
+            "doc_file": "local_posts/create_local_post.md"
+          },
+          "update_local_post": {
+            "endpoint": "PATCH https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts/{localPostsId}",
+            "description": "Updates the specified local post and returns the updated local post.",
+            "tier": "UPDATE",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The local post, in the form `accounts/{accountId}/locations/{locationId}/localPosts/{localPostId}`." },
+              { "name": "updateMask", "type": "string", "required": true, "description": "Comma-separated fields being updated; each changed field must be listed." },
+              { "name": "localPost", "type": "object (LocalPost)", "required": true, "description": "LocalPost carrying the new values for the fields in updateMask." }
+            ],
+            "response_fields": [
+              { "name": "name", "type": "string" },
+              { "name": "languageCode", "type": "string" },
+              { "name": "summary", "type": "string" },
+              { "name": "callToAction", "type": "object (CallToAction)" },
+              { "name": "createTime", "type": "string" },
+              { "name": "updateTime", "type": "string" },
+              { "name": "event", "type": "object (LocalPostEvent)" },
+              { "name": "state", "type": "string" },
+              { "name": "media", "type": "array<object (MediaItem)>" },
+              { "name": "searchUrl", "type": "string" },
+              { "name": "topicType", "type": "string" },
+              { "name": "alertType", "type": "string" },
+              { "name": "offer", "type": "object (LocalPostOffer)" }
+            ],
+            "schema": { "data": "LocalPostUpdateData", "result": "LocalPostUpdateResult", "note": "LocalPostUpdateData holds before: LocalPostData and after: LocalPostData (UPDATE-tier pattern)." },
+            "doc_file": "local_posts/update_local_post.md"
+          },
+          "delete_local_post": {
+            "endpoint": "DELETE https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts/{localPostsId}",
+            "description": "Deletes a local post; returns NOT_FOUND if the local post does not exist.",
+            "tier": "DELETE",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The local post, in the form `accounts/{accountId}/locations/{locationId}/localPosts/{localPostId}`." }
+            ],
+            "response_fields": [],
+            "schema": { "data": "LocalPostDeleteData", "result": "LocalPostDeleteResult" },
+            "doc_file": "local_posts/delete_local_post.md"
+          },
+          "report_local_post_insights": {
+            "endpoint": "POST https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/localPosts:reportInsights",
+            "description": "Returns insights for a set of local posts associated with a single listing. Limited to 100 localPostNames per call.",
+            "tier": "GET",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The location, in the form `accounts/{accountId}/locations/{locationId}`." },
+              { "name": "localPostNames", "type": "array<string>", "required": true, "description": "Posts to fetch insights for; all must belong to the location in name. Max 100." },
+              { "name": "basicRequest.metricRequests", "type": "array<object (MetricRequest)>", "required": false, "description": "{metric, options[]}." },
+              { "name": "basicRequest.timeRange.startTime", "type": "string", "required": false, "description": "Range start (inclusive), RFC3339 UTC. Max range 18 months." },
+              { "name": "basicRequest.timeRange.endTime", "type": "string", "required": false, "description": "Range end (exclusive), RFC3339 UTC." }
+            ],
+            "response_fields": [
+              { "name": "name", "type": "string" },
+              { "name": "localPostMetrics", "type": "array<object (LocalPostMetrics)>" },
+              { "name": "timeZone", "type": "string" }
+            ],
+            "schema": { "data": "LocalPostInsightsData", "result": "LocalPostInsightsResult" },
+            "doc_file": "local_posts/report_local_post_insights.md"
+          }
+        }
+      },
+      "reviews": {
+        "file": "reviews_tools.py",
+        "doc_source": ["list_reviews.md", "get_review.md", "batch_get_reviews.md", "update_review_reply.md", "delete_review_reply.md"],
+        "register_fn": "register_reviews_tools",
+        "tools": {
+          "list_reviews": {
+            "endpoint": "GET https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/reviews",
+            "description": "Returns the paginated list of reviews for the specified location. Only valid if the location is verified.",
+            "tier": "GET",
+            "params": [
+              { "name": "parent", "type": "string", "required": true, "description": "The location, in the form `accounts/{accountId}/locations/{locationId}`." },
+              { "name": "pageSize", "type": "integer", "required": false, "description": "Reviews per page. Maximum 50." },
+              { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page of reviews." },
+              { "name": "orderBy", "type": "string", "required": false, "description": "Sort order: `rating`, `rating desc`, or `updateTime desc` (default)." }
+            ],
+            "response_fields": [
+              { "name": "reviews", "type": "array<object (Review)>" },
+              { "name": "averageRating", "type": "number" },
+              { "name": "totalReviewCount", "type": "integer" },
+              { "name": "nextPageToken", "type": "string" }
+            ],
+            "schema": { "data": "ReviewListData", "result": "ReviewListResult" },
+            "doc_file": "reviews/list_reviews.md"
+          },
+          "get_review": {
+            "endpoint": "GET https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/reviews/{reviewsId}",
+            "description": "Returns the specified review. Only valid if the location is verified; NOT_FOUND if the review does not exist or was deleted.",
+            "tier": "GET",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The review, in the form `accounts/{accountId}/locations/{locationId}/reviews/{reviewId}`." }
+            ],
+            "response_fields": [
+              { "name": "name", "type": "string" },
+              { "name": "reviewId", "type": "string" },
+              { "name": "reviewer", "type": "object (Reviewer)" },
+              { "name": "starRating", "type": "string" },
+              { "name": "comment", "type": "string" },
+              { "name": "createTime", "type": "string" },
+              { "name": "updateTime", "type": "string" },
+              { "name": "reviewReply", "type": "object (ReviewReply)" },
+              { "name": "reviewMediaItems", "type": "array<object (ReviewMediaItem)>" }
+            ],
+            "schema": { "data": "ReviewGetData", "result": "ReviewGetResult" },
+            "doc_file": "reviews/get_review.md"
+          },
+          "batch_get_reviews": {
+            "endpoint": "POST https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations:batchGetReviews",
+            "description": "Returns the paginated list of reviews for all specified locations. Only valid if the locations are verified; max 50 locationNames per call.",
+            "tier": "GET",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The account, in the form `accounts/{accountId}`." },
+              { "name": "locationNames", "type": "array<string>", "required": true, "description": "Locations to fetch reviews for. Max 50." },
+              { "name": "pageSize", "type": "integer", "required": false, "description": "Reviews per page. Default 50." },
+              { "name": "pageToken", "type": "string", "required": false, "description": "Fetches the next page of reviews." },
+              { "name": "orderBy", "type": "string", "required": false, "description": "Sort order: `rating`, `rating desc`, or `updateTime desc` (default). Ascending updateTime is not supported." }
+            ],
+            "response_fields": [
+              { "name": "locationReviews", "type": "array<object (LocationReview)>" },
+              { "name": "nextPageToken", "type": "string" }
+            ],
+            "schema": { "data": "ReviewBatchGetData", "result": "ReviewBatchGetResult" },
+            "doc_file": "reviews/batch_get_reviews.md"
+          },
+          "update_review_reply": {
+            "endpoint": "PUT https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/reviews/{reviewsId}/reply",
+            "description": "Updates the reply to the specified review; a reply is created if one does not exist. Only valid if the location is verified.",
+            "tier": "UPDATE",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The review, in the form `accounts/{accountId}/locations/{locationId}/reviews/{reviewId}`." },
+              { "name": "comment", "type": "string", "required": true, "description": "Reply body, plain text with markups. Max 4096 bytes." }
+            ],
+            "response_fields": [
+              { "name": "comment", "type": "string" },
+              { "name": "updateTime", "type": "string" },
+              { "name": "reviewReplyState", "type": "string" },
+              { "name": "policyViolation", "type": "string" }
+            ],
+            "schema": { "data": "ReviewReplyUpdateData", "result": "ReviewReplyUpdateResult", "note": "ReviewReplyUpdateData holds before: ReviewReplyData | None (from the review's reviewReply) and after: ReviewReplyData." },
+            "doc_file": "reviews/update_review_reply.md"
+          },
+          "delete_review_reply": {
+            "endpoint": "DELETE https://mybusiness.googleapis.com/v4/accounts/{accountsId}/locations/{locationsId}/reviews/{reviewsId}/reply",
+            "description": "Deletes the response to the specified review. Only valid if the location is verified.",
+            "tier": "DELETE",
+            "params": [
+              { "name": "name", "type": "string", "required": true, "description": "The review, in the form `accounts/{accountId}/locations/{locationId}/reviews/{reviewId}`." }
+            ],
+            "response_fields": [],
+            "schema": { "data": "ReviewReplyDeleteData", "result": "ReviewReplyDeleteResult" },
+            "doc_file": "reviews/delete_review_reply.md"
           }
         }
       }

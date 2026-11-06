@@ -3,7 +3,7 @@
 import logging
 import os
 
-SERVER_VERSION = "v1.3.0"
+SERVER_VERSION = "v1.4.0"
 BREAKING_CHANGES: list[dict] = [
     {
         "tool": "update_location_attributes",
